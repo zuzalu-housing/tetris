@@ -1,15 +1,8 @@
-import React from "react";
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip
-} from "recharts";
+
 import Layout from "../components/layout/Layout";
 import { Heading } from "../components/Typography";
 import dynamic from "next/dynamic";
+import Head from "next/head";
 
 interface Props {
 
@@ -115,6 +108,9 @@ const StackedAreaChartNoSSR = dynamic(import("../components/StackedAreaChart"), 
 export default function Page(props: Props) {
   return (
     <Layout>
+      <Head>
+        <title>Dashboard</title>
+      </Head>
       <Heading>Dashboard</Heading>
 
       <h2 className="text-2xl font-semibold my-8">Gender balance ratio</h2>
