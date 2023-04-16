@@ -20,6 +20,7 @@ const Header = () => {
                 <NextLink href={"/"}>
                     <div className="hidden md:flex cursor-pointer gap-2 items-center justify-center ">
                         <NextImage
+                            alt="Zuzalu"
                             src={
                                 "https://polcxtixgqxfuvrqgthn.supabase.co/storage/v1/object/public/zulalu-images/zulalologo.png"
                             }
@@ -31,7 +32,7 @@ const Header = () => {
                 </NextLink>
                 <NextLink href={"/"}>
                     <div className="md:hidden flex cursor-pointer gap-2 items-center justify-center ">
-                        <NextImage src={"/logo-small.png"} objectFit="contain" width={50} height={50} />
+                        <NextImage alt="Zuzalu" src={"/logo-small.png"} objectFit="contain" width={50} height={50} />
                     </div>
                 </NextLink>
 
@@ -41,9 +42,9 @@ const Header = () => {
                         onClick={() => setNavbar(!navbar)}
                     >
                         {navbar ? (
-                            <NextImage src={"/close.png"} width={32} height={32} />
+                            <NextImage alt="Close" src={"/close.png"} width={32} height={32} />
                         ) : (
-                            <NextImage src={"/hamburger.png"} width={22} height={18} />
+                            <NextImage alt="Menu" src={"/hamburger.png"} width={22} height={18} />
                         )}
                     </button>
                 </div>
