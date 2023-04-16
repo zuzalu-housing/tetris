@@ -54,6 +54,8 @@ export default function Page() {
     }
   })
 
+  const [submitted, setSubmitted] = useState(false);
+
   const [application, setApplication] = useState({
     weeks: new Set(),
     same_gender: false,
@@ -97,7 +99,9 @@ export default function Page() {
       uuid: participant?.uuid ?? "",
       gender: application.gender ?? ""
     };
-    await axios.post("/api/submitApplication", { application: app });
+    await axios.post("/api/submitApplication", { application: app }).then(() => {
+      setSubmitted(true);
+    });
   }
 
   return (
@@ -128,6 +132,7 @@ export default function Page() {
       {participant &&
         <div className="text-lg">
           <p className="my-4">Welcome to Zuzalu, <strong className="font-bold">{participant.name}</strong></p>
+          {!submitted &&
           <div>
             <div>
               <div className="flex flex-col gap-1">
@@ -323,7 +328,14 @@ export default function Page() {
               <PrimaryButton onClick={submitApplication}>Submit Application</PrimaryButton>
               </div>
             </div>
+          </div>}
+
+          {submitted &&
+          <div className="text-lg flex flex-col gap-4">
+            <p>Application submitted!</p>
+            <p>Please wait for an email to {participant.email} with further instructions.</p>
           </div>
+          }
         </div>}
     </Layout>
   );
