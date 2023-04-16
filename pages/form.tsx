@@ -12,30 +12,22 @@ import { PrimaryButton } from "../components/Button";
 import Cookies from "js-cookie";
 import Link from "next/link";
 import Head from "next/head";
+import axios from "axios";
+import build from "next/dist/build";
 
+interface SubmitApplication {
+  weeks: number[],
+  prefer_same_gender: boolean,
+  morning_person: boolean,
+  introvert: boolean,
+  communities: string[],
+  uuid: string,
+  gender: string,
+  email: string,
+  name: string,
+  gender: string
+}
 
-/*        {signatureProof != null && (
-          <>
-            <h3>Got Semaphore Signature Proof from Passport</h3>
-            <p>{`Message signed: ${signatureProof.claim.signedMessage}`}</p>
-            {signatureProofValid === undefined && <p>❓ Proof verifying</p>}
-            {signatureProofValid === false && <p>❌ Proof is invalid</p>}
-            {signatureProofValid === true && <p>✅ Proof is valid</p>}
-            <pre>
-              {JSON.stringify(signatureProof, null, 2)}</pre>
-          </>
-        )}
-        {participant && (
-          <>
-            {participant.commitment ===
-            signatureProof?.claim.identityCommitment ? (
-              <p>✅ Commitment matches</p>
-            ) : (
-              <p>❌ Commitment does not match</p>
-            )}
-            <pre>{JSON.stringify(participant, null, 2)}</pre>
-          </>
-        )}*/
 
 export default function Page({ details }) {
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
@@ -45,7 +37,10 @@ export default function Page({ details }) {
   // Extract UUID, the signed message of the returned PCD
   const [uuid, setUuid] = useState<string | undefined>();
   useEffect(() => {
-    if (signatureProofValid && signatureProof) {
+    if (Cookies.get("uuid")) {
+      setUuid(Cookies.get("uuid"));
+    }
+    else if (signatureProofValid && signatureProof) {
       const userUuid = signatureProof.claim.signedMessage;
       setUuid(userUuid);
     }
@@ -59,6 +54,52 @@ export default function Page({ details }) {
       Cookies.set("uuid", participant.uuid);
     }
   })
+
+  const [application, setApplication] = useState({
+    weeks: new Set(),
+    same_gender: false,
+    introvert: false,
+    early_riser: false,
+    zk: false,
+    longevity: false,
+    public_goods: false,
+    gender: undefined
+  });
+
+  const weeks = Array.from(Array(8).keys());
+
+  const buildCommunities = () => {
+    const communities = [];
+
+    if (application.zk) {
+      communities.push("ZK");
+    }
+
+    if (application.longevity) {
+      communities.push("longevity");
+    }
+
+    if (application.public_goods) {
+      communities.push("public_goods");
+    }
+
+    return communities;
+  }
+
+  const submitApplication = async () => {
+    const app: SubmitApplication = {
+      prefer_same_gender: application.same_gender,
+      introvert: application.introvert,
+      morning_person: application.early_riser,
+      weeks: Array.from(application.weeks.values()) as number[],
+      communities: buildCommunities(),
+      name: participant?.name ?? "",
+      email: participant?.email ?? "",
+      uuid: participant?.uuid ?? "",
+      gender: application.gender
+    };
+    await axios.post("/api/submitApplication", { application: app });
+  }
 
   return (
     <Layout>
@@ -89,26 +130,69 @@ export default function Page({ details }) {
         <div className="text-lg">
           <p className="my-4">Welcome to Zuzalu, <strong className="font-bold">{participant.name}</strong></p>
           <div>
-            <form>
+            <div>
+              <div className="flex flex-col gap-1">
+                <div className="font-semibold">When would you like to attend?</div>
+                {weeks.map((week: number) => {
+                  const weekNum = week + 1;
+                  return (
+                    <div>
+                      <label className="inline-flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox"
+                            onChange={() => { if (application.weeks.has(week)) {
+                              const a = { ...application };
+                              application.weeks.delete(week);
+                              a.weeks = application.weeks;
+                              setApplication(a);
+                            } else {
+                              const a = { ...application };
+                              application.weeks.add(week);
+                              a.weeks = application.weeks;
+                              setApplication(a);
+                  
+                            }
+                          }}
+                        className="                        rounded
+                            border-gray-300
+                            text-indigo-600
+                            shadow-sm
+                            focus:border-indigo-300
+                            focus:ring
+                            focus:ring-offset-0
+                            focus:ring-indigo-200
+                            focus:ring-opacity-50" checked={application.weeks.has(week)} />
+                        <span>Week {weekNum}</span>
+                      </label>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="my-4 font-semibold">Other preferences</div>
               <div>
                 <label className="inline-flex items-center">
-                  <input type="radio" className="
-                          rounded
-                          border-gray-300
-                          text-indigo-600
-                          shadow-sm
-                          focus:border-indigo-300
-                          focus:ring
-                          focus:ring-offset-0
-                          focus:ring-indigo-200
-                          focus:ring-opacity-50
-                        " checked={false} />
-                  <span className="ml-2">Email me news and special offers</span>
+                <span className="mr-2">Gender</span>
+                  <select defaultValue={"-"} value={application.gender} onChange={(e) => {
+                    const a = { ...application };
+                    a.gender = e.target.value;
+                    setApplication(a);
+                  }}>
+                    <option value="-">Unspecified</option>
+                    <option value="M">Male</option>
+                    <option value="F">Female</option>
+                  </select>
+         
+        
                 </label>
               </div>
               <div>
                 <label className="inline-flex items-center">
-                  <input type="checkbox" className="
+                  <input 
+                           onChange={() => {
+                            const a = { ...application };
+                            a.same_gender = !application.same_gender;
+                            setApplication(a);
+                          }}
+                  type="checkbox" className="
                             rounded
                             border-gray-300
                             text-indigo-600
@@ -118,14 +202,128 @@ export default function Page({ details }) {
                             focus:ring-offset-0
                             focus:ring-indigo-200
                             focus:ring-opacity-50
-                          " checked={false} />
-                  <span className="ml-2">Email me news and special offers</span>
+                          " checked={application.same_gender} />
+                  <span className="ml-2">Prefer to share with same gender</span>
                 </label>
               </div>
-              <div>dates</div>
-              <div>preferences</div>
+              <div>
+                <label className="inline-flex items-center">
+                  <input 
+                           onChange={() => {
+                            const a = { ...application };
+                            a.introvert = !application.introvert;
+                            setApplication(a);
+                          }}
+                  type="checkbox" className="
+                            rounded
+                            border-gray-300
+                            text-indigo-600
+                            shadow-sm
+                            focus:border-indigo-300
+                            focus:ring
+                            focus:ring-offset-0
+                            focus:ring-indigo-200
+                            focus:ring-opacity-50
+                          " checked={application.introvert} />
+                  <span className="ml-2">Prefer to share with introvert</span>
+                </label>
+              </div>
 
-            </form>
+              <div>
+                <label className="inline-flex items-center">
+                  <input
+                    onChange={() => {
+                      const a = { ...application };
+                      a.early_riser = !application.early_riser;
+                      setApplication(a);
+                    }}
+                  type="checkbox" className="
+                            rounded
+                            border-gray-300
+                            text-indigo-600
+                            shadow-sm
+                            focus:border-indigo-300
+                            focus:ring
+                            focus:ring-offset-0
+                            focus:ring-indigo-200
+                            focus:ring-opacity-50
+                          " checked={application.early_riser} />
+                  <span className="ml-2">Prefer to share with early riser</span>
+                </label>
+              </div>
+
+              <div className="my-4 font-semibold">Communities</div>
+              <div>
+                <label className="inline-flex items-center">
+                  <input
+                    onChange={() => {
+                      const a = { ...application };
+                      a.public_goods = !application.public_goods;
+                      setApplication(a);
+                    }}
+                  type="checkbox" className="
+                            rounded
+                            border-gray-300
+                            text-indigo-600
+                            shadow-sm
+                            focus:border-indigo-300
+                            focus:ring
+                            focus:ring-offset-0
+                            focus:ring-indigo-200
+                            focus:ring-opacity-50
+                          " checked={application.public_goods} />
+                  <span className="ml-2">Public goods</span>
+                </label>
+              </div>
+              <div>
+                <label className="inline-flex items-center">
+                  <input
+                    onChange={() => {
+                      const a = { ...application };
+                      a.zk = !application.zk;
+                      setApplication(a);
+                    }}
+                  type="checkbox" className="
+                            rounded
+                            border-gray-300
+                            text-indigo-600
+                            shadow-sm
+                            focus:border-indigo-300
+                            focus:ring
+                            focus:ring-offset-0
+                            focus:ring-indigo-200
+                            focus:ring-opacity-50
+                          " checked={application.zk} />
+                  <span className="ml-2">ZK</span>
+                </label>
+              </div>
+              <div>
+                <label className="inline-flex items-center">
+                  <input
+                    onChange={() => {
+                      const a = { ...application };
+                      a.longevity = !application.longevity;
+                      setApplication(a);
+                    }}
+                  type="checkbox" className="
+                            rounded
+                            border-gray-300
+                            text-indigo-600
+                            shadow-sm
+                            focus:border-indigo-300
+                            focus:ring
+                            focus:ring-offset-0
+                            focus:ring-indigo-200
+                            focus:ring-opacity-50
+                          " checked={application.longevity} />
+                  <span className="ml-2">Longevity</span>
+                </label>
+              </div>
+
+                <div className="my-4">
+              <PrimaryButton onClick={submitApplication}>Submit Application</PrimaryButton>
+              </div>
+            </div>
           </div>
         </div>}
     </Layout>

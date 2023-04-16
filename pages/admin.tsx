@@ -88,7 +88,7 @@ function InfoDialog({ application, onClose, isOpen }: { application: any, onClos
                 <div className="flex">
                   <div className="w-48 font-semibold">Weeks attending</div>
                   <div>
-                    {application.weeks.map((num) => { return num+1 }).join(", ")}
+                    {application.weeks.sort().map((num) => { return num+1 }).join(", ")}
                   </div>
                 </div>
               </div>}
