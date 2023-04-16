@@ -11,6 +11,7 @@ import { Heading } from "../components/Typography";
 import { PrimaryButton } from "../components/Button";
 import Cookies from "js-cookie";
 import Link from "next/link";
+import Head from "next/head";
 
 
 /*        {signatureProof != null && (
@@ -61,6 +62,9 @@ export default function Page({ details }) {
 
   return (
     <Layout>
+      <Head>
+        <title>Apply to Attend</title>
+      </Head>
       <Heading>Apply to Attend</Heading>
       {!participant &&
       <div>
@@ -86,9 +90,41 @@ export default function Page({ details }) {
           <p className="my-4">Welcome to Zuzalu, <strong className="font-bold">{participant.name}</strong></p>
           <div>
             <form>
+              <div>
+                <label className="inline-flex items-center">
+                  <input type="radio" className="
+                          rounded
+                          border-gray-300
+                          text-indigo-600
+                          shadow-sm
+                          focus:border-indigo-300
+                          focus:ring
+                          focus:ring-offset-0
+                          focus:ring-indigo-200
+                          focus:ring-opacity-50
+                        " checked={false} />
+                  <span className="ml-2">Email me news and special offers</span>
+                </label>
+              </div>
+              <div>
+                <label className="inline-flex items-center">
+                  <input type="checkbox" className="
+                            rounded
+                            border-gray-300
+                            text-indigo-600
+                            shadow-sm
+                            focus:border-indigo-300
+                            focus:ring
+                            focus:ring-offset-0
+                            focus:ring-indigo-200
+                            focus:ring-opacity-50
+                          " checked={false} />
+                  <span className="ml-2">Email me news and special offers</span>
+                </label>
+              </div>
               <div>dates</div>
               <div>preferences</div>
-              
+
             </form>
           </div>
         </div>}

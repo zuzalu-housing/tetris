@@ -1,3 +1,4 @@
+import Head from "next/head";
 import { Heading } from "../components/Typography";
 import Layout from "../components/layout/Layout";
 import { supabase } from "../utils/supabase";
@@ -16,10 +17,15 @@ const TH = tw.th`text-left`
 export default function Page({ applications }: Props) {
 return (
   <Layout>
+    <Head>
+      <title>Administer Applications</title>
+    </Head>
     <Heading>Pending Applications</Heading>
     <table className="table-auto w-full">
       <thead>
+        <tr>
         <TH>Name</TH><TH>Email</TH><TH>Gender</TH><TH>Actions</TH>
+        </tr>
       </thead>
       <tbody>
       {applications && applications.map(application => {
