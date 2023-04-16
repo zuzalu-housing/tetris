@@ -40,6 +40,8 @@ export default async function handler(
 
     console.log(x);
 
+    if (x.data) {
+
     const id = x.data[0].id;
 
   console.log(await supabase
@@ -48,6 +50,7 @@ export default async function handler(
       resident_id: id,
       weeks: application.weeks,
     }));
+  }
 
 /*  console.log(await supabase
     .from("applications")

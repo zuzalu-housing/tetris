@@ -20,7 +20,7 @@ interface Props {
 
 const TH = tw.th`text-left`
 
-function booleanPref(value) {
+function booleanPref(value: boolean) {
   switch (value) {
     case true: return "True";
     case false: return "False";
@@ -79,7 +79,7 @@ function InfoDialog({ application, onClose, isOpen }: { application: any, onClos
                 <div className="flex">
                   <div className="w-48 font-semibold">Communities</div>
                   <div>
-                    {application.communities && application.communities.map((community) => {
+                    {application.communities && application.communities.map((community: string) => {
                       return <div className="capitalize">{community}</div>
                     })}
                   </div>
@@ -88,7 +88,7 @@ function InfoDialog({ application, onClose, isOpen }: { application: any, onClos
                 <div className="flex">
                   <div className="w-48 font-semibold">Weeks attending</div>
                   <div>
-                    {application.weeks.sort().map((num) => { return num+1 }).join(", ")}
+                    {application.weeks.sort().map((num: number) => { return num+1 }).join(", ")}
                   </div>
                 </div>
               </div>}
@@ -134,7 +134,6 @@ return (
       <title>Administer Applications</title>
     </Head>
     <Heading>Pending Applications</Heading>
-    <InfoDialog />
     <table className="table-auto w-full text-lg mt-6 border-spacing-2 border-separate">
       <thead>
         <tr className="">
@@ -170,7 +169,7 @@ async function fetchApplications() {
   }
 }
 
-export async function getServerSideProps(context) {
+export async function getServerSideProps(context: any) {
   return {
     props: {
       applications: await fetchApplications()

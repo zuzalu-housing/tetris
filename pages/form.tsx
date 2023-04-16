@@ -25,11 +25,10 @@ interface SubmitApplication {
   gender: string,
   email: string,
   name: string,
-  gender: string
 }
 
 
-export default function Page({ details }) {
+export default function Page() {
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
   const { signatureProof, signatureProofValid } =
     useSemaphoreSignatureProof(pcdStr);
@@ -96,7 +95,7 @@ export default function Page({ details }) {
       name: participant?.name ?? "",
       email: participant?.email ?? "",
       uuid: participant?.uuid ?? "",
-      gender: application.gender
+      gender: application.gender ?? ""
     };
     await axios.post("/api/submitApplication", { application: app });
   }
